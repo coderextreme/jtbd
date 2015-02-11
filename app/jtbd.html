@@ -1,0 +1,352 @@
+	<!DOCTYPE HTML>
+	<html>
+	  <head>
+	    <style>
+	      body {
+		margin: 0px;
+		padding: 0px;
+	      }
+	    </style>
+	    <script>
+	      var jsons = [];
+	      var j = 0;
+	      var json = null;
+	      var canvas = null;
+	      var mouse = { x:0, y:0 };
+	      var knobsize = 10;
+	      var recorder = null;
+	      var firstPort = null;
+	      var secondPort = null;
+	      function wrapText(text, x, y, maxWidth, lineHeight, style) {
+		var words = text.split(" ");
+		var line = "";
+		var context = canvas.getContext('2d');
+		context.font = "14pt Calibri";
+		context.fillStyle = style;
+
+		for(var n = 0; n < words.length; n++) {
+		  var testLine = line + words[n] + " ";
+		  var metrics = context.measureText(testLine);
+		  var testWidth = metrics.width;
+		  if(testWidth > maxWidth) {
+		    context.fillText(line, x, y);
+		    line = words[n] + " ";
+		    y += lineHeight;
+		  }
+		  else {
+		    line = testLine;
+		  }
+		}
+		context.fillText(line, x, y);
+	      }
+	      function createPort(json, style, ports, input) {
+		var port = { json: json, index: ports.length, style: style, input: input,
+				draw : function() {
+					var context = canvas.getContext('2d');
+					context.beginPath();
+					if (input) {
+						context.rect(json.x-knobsize, json.y+this.index*knobsize*2, knobsize, knobsize);
+					} else {
+						context.rect(json.x+json.width, json.y+this.index*knobsize*2, knobsize, knobsize);
+					}
+					if (this.enabled) {
+						context.fillStyle = this.style;
+					} else {
+						context.fillStyle = 'white';
+					}
+					context.fill();
+					context.strokeStyle = 'black';
+					context.stroke();
+				},
+				toggle : function() {
+					if (recorder != null) {
+						if (port.enabled) {
+							recorder.appendToArray({type: port.input ? "input" : "output", operation : "disable", index: port.index, jsonIndex : json.index});
+						} else {
+							recorder.appendToArray({type: port.input ? "input" : "output", operation : "enable", index: port.index, jsonIndex : json.index});
+						}
+					}
+					port.enabled = !port.enabled;
+					port.draw();
+					if (firstPort != secondPort) {
+						firstPort = secondPort;
+					}
+					secondPort = port;
+				}
+			 };
+		ports.push(port);
+		return port;
+	      }
+
+	      function createJSON(title) {
+		      mouse = getMousePos();
+		      jsons.push({});
+		      json = jsons[jsons.length-1];
+		      json.index = jsons.length-1;
+		      json.width = 200;
+		      json.height = 400;
+		      json.x = mouse.x-json.width/2;
+		      json.y = mouse.y-json.height/2;
+		      json.inputs = [];
+		      json.outputs = [];
+		      json.text = "";
+		      json.selected = true;
+		      json.title = prompt("Enter title:", title);
+
+		      json.draw = function(style) {
+			var context = canvas.getContext('2d');
+			context.beginPath();
+			context.rect(this.x, this.y, this.width, this.height);
+			context.strokeStyle = style;
+			context.stroke();
+			wrapText(this.text, this.x+10, this.y+35, this.width-20, 25, style);
+			for (var p = 0; p < this.inputs.length; p++) {
+				this.inputs[p].draw(this);
+			}
+			for (var p = 0; p < this.outputs.length; p++) {
+				this.outputs[p].draw(this);
+			}
+			writeLocatedMessage(this.title, this.x, this.y);
+		      }
+		      json.makeInput = function() {
+				var port = createPort(this, 'blue', this.inputs, true);
+				port.draw(this);
+				return this.inputs.length-1;
+			}
+		      json.makeOutput = function() {
+				var port = createPort(this, 'green', this.outputs, false);
+				port.draw(this);
+				return this.outputs.length-1;
+			}
+			json.appendToArray = function(op) {
+				var object = JSON.parse(recorder.text);
+				object.push(op);
+				recorder.text = JSON.stringify(object, null, " ");
+				recorder.draw('black');
+				};
+			return json;
+		}
+	      function writeMessage(message) {
+			writeLocatedMessage(message, 10, 25);
+	      }
+	      function writeLocatedMessage(message, x, y) {
+		var context = canvas.getContext('2d');
+		context.font = '18pt Calibri';
+		context.fillStyle = 'black';
+		context.fillText(message, x, y);
+	      }
+	      function setMousePos(e, json) {
+		mouse.x = e.clientX;
+		mouse.y = e.clientY;
+		if (json != null) {
+			mouse.x -= json.x;
+			mouse.y -= json.y;
+		}
+	      }
+	      function getMousePos() {
+		return mouse;
+	      }
+
+	      var relationships = []
+	      function createRelationship(first, second) {
+			if (first.input) {
+				relationships.push({ first: second, second: first });
+			} else {
+				relationships.push({ first: first, second: second });
+			}
+			alert("relationship created");
+	      }
+	      window.onload = function() {
+		relationship = document.getElementById("relationship");
+		relationship.addEventListener('click', function(evt) {
+			if (firstPort != null && secondPort != null) {
+				createRelationship(firstPort, secondPort);
+			} else {
+				alert("first "+firstPort+" second "+secondPort);
+			}
+		  }, false);
+		makeSource = document.getElementById("makeSource");
+		makeSource.addEventListener('click', function(evt) {
+			json = createJSON("Source");
+			json.text =  prompt('Enter some JSON', '{}');
+			json.makeOutput();
+			if (recorder != null) {
+				recorder.appendToArray({type: "source", operation : "create", title: json.title, text : json.text });
+			} else {
+				alert("No recorder");
+			}
+		  }, false);
+		makeSink = document.getElementById("makeSink");
+		makeSink.addEventListener('click', function(evt) {
+			json = createJSON("Sink");
+			json.text =  '';
+			json.makeInput();
+			if (recorder != null) {
+				recorder.appendToArray({type: "sink", operation : "create", title: json.title, text : json.text });
+			} else {
+				alert("No recorder");
+			}
+		  }, false);
+		makeJSON = document.getElementById("makeJSON");
+		makeJSON.addEventListener('click', function(evt) {
+			json = createJSON("JSON Object");
+			if (recorder != null) {
+				recorder.appendToArray({type: "json", operation : "create", title: json.title });
+			} else {
+				alert("No recorder");
+			}
+		  }, false);
+		input = document.getElementById("input");
+		input.addEventListener('click', function(evt) {
+			if (json == null) {
+				json = createJSON("JSON Object");
+			}
+			var p = json.makeInput();
+			if (recorder != null) {
+				recorder.appendToArray({type: "input", operation : "create", index: p, jsonIndex: json.index });
+			} else {
+				alert("No recorder");
+			}
+		  }, false);
+		output = document.getElementById("output");
+		output.addEventListener('click', function(evt) {
+			if (json == null) {
+				json = createJSON("JSON Object");
+			}
+			var p = json.makeOutput();
+			if (recorder != null) {
+				recorder.appendToArray({type: "output", operation : "create", index: p, jsonIndex: json.index});
+			} else {
+				alert("No recorder");
+			}
+		  }, false);
+		sequence = document.getElementById("sequence");
+		sequence.addEventListener('click', function(evt) {
+			if (json == null) {
+				recorder = createJSON('recorder');
+				recorder.text = "[]";
+				recorder.appendToArray({type: "recorder", operation : "create", title: recorder.title});
+			} else { 
+				if (recorder != null) {
+					recorder.appendToArray({type: "recorder", operation : "switch", jsonIndex: json.index });
+				}
+				recorder = json;
+				recorder.title = "recorder "+recorder.index;
+				if (recorder.text == "" || recorder.text == null) {
+					recorder.text = "[]";
+					var object = JSON.parse(recorder.text);
+					recorder.text = JSON.stringify(object, null, " ");
+				}
+				recorder.draw('black');
+			}
+		  }, false);
+		canvas = document.getElementById("canvas");
+		var context = canvas.getContext("2d");
+		canvas.addEventListener('mousemove', function(evt) {
+          var context = canvas.getContext('2d');
+	  context.clearRect(1, 1, canvas.width-2, canvas.height-2);
+	  mouse = getMousePos();
+          var message = "Mouse position: " + mouse.x + "," + mouse.y;
+	  if (json != null && json.selected) {
+		json.x = evt.clientX - mouse.x;
+		json.y = evt.clientY - mouse.y;
+	  }
+	  for (var w = 0; w < jsons.length; w++) {
+		var widget = jsons[w];
+		widget.draw('black');
+	  }
+	  for (var relindex = 0; relindex < relationships.length; relindex++) {
+		var r = relationships[relindex];
+		context.beginPath();
+		context.strokeStyle = 'black';
+		context.moveTo(
+			r.first.json.x+r.first.json.width+knobsize/2,
+			r.first.json.y+r.first.index*knobsize*2+knobsize/2
+			);
+		context.lineTo(
+			r.second.json.x-knobsize/2,
+			r.second.json.y+r.second.index*knobsize*2+knobsize/2
+			);
+		context.stroke();
+          	message +=
+			[
+			r.first.json.x+r.first.json.width+knobsize/2,
+			r.first.json.y+r.first.index*knobsize*2+knobsize/2,
+			r.second.json.x-knobsize/2,
+			r.second.json.y+r.second.index*knobsize*2+knobsize/2
+			].join(",");
+	  }
+	  writeMessage(message);
+          }, false);
+	canvas.addEventListener('click', function(evt) {
+		setMousePos(evt, json);
+		toggle(evt);
+          }, false);
+	context.beginPath();
+	context.rect(0, 0, canvas.width, canvas.height);
+	context.strokeStyle = 'black';
+        context.stroke();
+      };
+
+	function toggleColor(e, puts, left, right, top) {
+        	var context = canvas.getContext("2d");
+		if (e.clientX >= left && e.clientX <= right) {
+			for (var p = 0; p < puts.length; p++) {
+				if (e.clientY >= top+p*knobsize*2 && e.clientY <= top+p*knobsize*2+knobsize) {
+					puts[p].toggle();
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	function toggle(event) {
+		var mindis = 9000000;
+		var lastjson = json;
+		var message = "";
+		for (var p = 0; p < jsons.length; p++) {
+			var js = jsons[p];
+			var xd = js.x+(js.width>>2) - event.clientX;
+			var yd = js.y+(js.height>>2) - event.clientY;
+			var cd = xd * xd + yd * yd;
+			if (cd < mindis) {
+				mindis = cd;
+				if (js.x <= event.clientX && event.clientX <= js.x+js.width) {
+					json = jsons[p];
+				}
+			}
+		}
+		if (json == lastjson) {
+			json.selected = !json.selected;
+		} else {
+			setMousePos(event, json);
+			json.selected = true;
+		}
+		if (json != null) {
+			var retin = toggleColor(event, json.inputs, json.x-knobsize, json.x, json.y+28);
+			var retout = toggleColor(event, json.outputs, json.x+json.width, json.x+json.width+knobsize, json.y+28);
+			if (retin || retout) {
+				json.selected = false;
+			}
+		}
+	}
+    </script>
+  </head>
+  <body>
+    <div>
+    <span>
+    <button id="makeJSON">Make JSON</button>
+    <button id="makeSource">Make a JSON source</button>
+    <button id="makeSink">Make a JSON sink</button>
+    <button id="input">Make input port</button>
+    <button id="output">Make output port</button>
+    <button id="sequence">Treat JSON as recorder</button>
+    <button id="relationship">Connect ports</button>
+    </span>
+    </div>
+    <div>
+    <canvas id="canvas" width="1024" height="768"></canvas>
+    </div>
+  </body>
+</html>
+

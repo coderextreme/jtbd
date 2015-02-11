@@ -1,0 +1,14 @@
+<div ng-drop="true" ng-drop-success="onDropComplete($data,$event)" class="jumbotron">
+	<input ng-model="copy"/>
+	<div ng-repeat="json in jsons" style="border-width:1px;border-style:solid;position:absolute;left:{{json.left}};top:{{json.top}};width:{{json.width}};height:{{json.height}};overflow:auto;">
+		<div>
+			{{json.title}}
+			<input ng-model="filter"/>
+			<button ng-click="copyIn(json, filter)">Copy In</button>
+			<button ng-click="copyOut(json.record, filter)">Copy Out</button>
+		</div>
+		<div ng-drag="true" ng-drag-data="{{json}}" ng-drag-success="onDragComplete($data,$event)">
+			{{json.record | array:filter}}
+		</div>
+	</div>
+</div>
