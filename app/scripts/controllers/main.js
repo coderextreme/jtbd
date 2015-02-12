@@ -68,24 +68,25 @@ angular.module('healthjwcApp')
 				}
 			}
 			//console.log(indexes.length-1, indexes[indexes.length-1], selection);
-			selection[indexes[indexes.length-1]] = $scope.copy;
+			selection[indexes[indexes.length-1]] = JSON.parse(JSON.stringify($scope.copy));
 		} else {
-			selection = $scope.copy;
-			console.log("Result JSON", selection);
+			selection =  JSON.parse(JSON.stringify($scope.copy));
+			json.record = selection;
+			console.log('Result JSON', selection);
 		}
-		json.record = selection;
+		// json.record = selection;
     };
     $scope.copyOut = function(json, filter) {
+		var selection = json;
 		if (typeof(filter) !== 'undefined' && filter.trim() !== '') {
 			var indexes = filter.split(/,/);
 			for (var index in indexes) {
 				if (indexes[index].trim() === '') {
 					break;
 				}
-				//console.log(index, indexes[index], json);
-				json = json[indexes[index]];
+				selection = selection[indexes[index]];
 			}
 		}
-		$scope.copy = json;
+		$scope.copy = JSON.parse(JSON.stringify(selection));
     };
   });
