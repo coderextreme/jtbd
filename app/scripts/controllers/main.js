@@ -73,9 +73,9 @@ angular.module('healthjwcApp')
 				}
 			}
 			//console.log(indexes.length-1, indexes[indexes.length-1], selection);
-			selection[indexes[indexes.length-1]] = JSON.parse(JSON.stringify($scope.copy));
+			selection[indexes[indexes.length-1]] = JSON.parse($scope.copy);
 		} else {
-			selection =  JSON.parse(JSON.stringify($scope.copy));
+			selection =  JSON.parse($scope.copy);
 			json.record = selection;
 			console.log('Result JSON', selection);
 		}
@@ -96,6 +96,6 @@ angular.module('healthjwcApp')
 				selection = selection[indexes[index]];
 			}
 		}
-		$scope.copy = JSON.parse(JSON.stringify(selection));
+		$scope.copy = JSON.stringify(selection);
     };
   });
