@@ -53,27 +53,40 @@ angular.module('healthjwcApp')
 
     $scope.copyIn = function(json, filter) {
 		var selection = json.record;
+		var higherselection = selection;
 		if (typeof(filter) !== 'undefined' && filter.trim() !== '') {
 			var indexes = filter.split(/,/);
 			//console.log(indexes, 'Begin copy in', selection);
 			if (indexes.length > 1) {
 				var upto = indexes.slice(0, indexes.length-1);
 				//console.log(upto, 'Nested structure');
+				var filterInt = function (value) { if(/^(\-|\+)?([0-9]+|Infinity)$/.test(value)) { return Number(value); } else { return NaN; } };
 				for (var index in upto) {
-					var ret = function (value) { if(/^(\-|\+)?([0-9]+|Infinity)$/.test(value)) return Number(value); return NaN; }(index);
-					if (ret !== NaN) {
+					var ret = filterInt(index);
+					if (!isNaN(ret)) {
 						index = ret;
 					}
 					if (indexes[index].trim() === '') {
 						break;
 					}
 					//console.log(index, indexes[index], selection);
+					higherselection = selection;
 					selection = selection[indexes[index]];
 					//console.log("Result JSON", selection);
 				}
 			}
 			//console.log(indexes.length-1, indexes[indexes.length-1], selection);
-			selection[indexes[indexes.length-1]] = JSON.parse($scope.copy);
+			var jsonstuff = JSON.parse($scope.copy);
+			if (typeof selection === 'string' && jsonstuff.length === 1 && typeof jsonstuff === 'string') {
+			    var a = selection.split('');
+			    a[indexes[indexes.length-1]] = jsonstuff;
+			    selection = a.join('');
+			    if (typeof higherselection === 'object') {
+					higherselection[indexes[indexes.length-2]] = selection;
+			    }
+			} else {
+				selection[indexes[indexes.length-1]] = jsonstuff;
+			}
 		} else {
 			selection =  JSON.parse($scope.copy);
 			json.record = selection;
@@ -85,9 +98,10 @@ angular.module('healthjwcApp')
 		var selection = json;
 		if (typeof(filter) !== 'undefined' && filter.trim() !== '') {
 			var indexes = filter.split(/,/);
+			var filterInt = function (value) { if(/^(\-|\+)?([0-9]+|Infinity)$/.test(value)) { return Number(value); } else { return NaN; } };
 			for (var index in indexes) {
-				var ret = function (value) { if(/^(\-|\+)?([0-9]+|Infinity)$/.test(value)) return Number(value); return NaN; }(index);
-				if (ret !== NaN) {
+				var ret = filterInt(index);
+				if (!isNaN(ret)) {
 					index = ret;
 				}
 				if (indexes[index].trim() === '') {
