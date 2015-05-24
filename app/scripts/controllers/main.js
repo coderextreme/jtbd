@@ -31,7 +31,7 @@ angular.module('healthjwcApp')
 		  'top': '250px',
 		  'width': '200px',
 		  'height': '300px',
-		  'record' : {},
+		  'record' : [],
 		};
     });
     $scope.onDragComplete=function(data,evt){
@@ -50,6 +50,7 @@ angular.module('healthjwcApp')
        evt.element[0].parentElement.style.left = evt.tx+'px';
        evt.element[0].parentElement.style.position = 'absolute';
     };
+
     $scope.copyIn = function(json, filter) {
 		var selection = json.record;
 		if (typeof(filter) !== 'undefined' && filter.trim() !== '') {
@@ -59,6 +60,10 @@ angular.module('healthjwcApp')
 				var upto = indexes.slice(0, indexes.length-1);
 				//console.log(upto, 'Nested structure');
 				for (var index in upto) {
+					var ret = function (value) { if(/^(\-|\+)?([0-9]+|Infinity)$/.test(value)) return Number(value); return NaN; }(index);
+					if (ret !== NaN) {
+						index = ret;
+					}
 					if (indexes[index].trim() === '') {
 						break;
 					}
@@ -81,6 +86,10 @@ angular.module('healthjwcApp')
 		if (typeof(filter) !== 'undefined' && filter.trim() !== '') {
 			var indexes = filter.split(/,/);
 			for (var index in indexes) {
+				var ret = function (value) { if(/^(\-|\+)?([0-9]+|Infinity)$/.test(value)) return Number(value); return NaN; }(index);
+				if (ret !== NaN) {
+					index = ret;
+				}
 				if (indexes[index].trim() === '') {
 					break;
 				}
