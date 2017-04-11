@@ -2,12 +2,8 @@
 
 # to install, run
 
-npm install
-
-and
-
-bower install
-
-then to run, use
-
-grunt serve
+```
+$ npm install
+$ npm install -g bower
+$ bower install
+$ grunt serve
