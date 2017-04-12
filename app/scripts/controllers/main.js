@@ -15,7 +15,7 @@ angular.module('healthjwcApp')
       'Karma'
     ];
     $http.get('output.json')
-      .success(function(record/*, status, headers, config*/) {
+      .then(function(record/*, status, headers, config*/) {
 	    $scope.jsons = [];
 	    $scope.jsons[0] =
 		{ 'title': 'Input Medical Record',
