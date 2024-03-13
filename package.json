@@ -1,10 +1,10 @@
 {
   "name": "healthjwc",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "private": "true",
   "dependencies": {},
   "devDependencies": {
-    "bower": "1.8.14",
+    "bower": "*",
     "grunt": "*",
     "grunt-autoprefixer": "*",
     "grunt-concurrent": "*",
@@ -36,7 +36,7 @@
     "time-grunt": "*"
   },
   "engines": {
-    "node": ">=0.10.0"
+    "node": "*"
   },
   "scripts": {
     "test": "grunt test"
