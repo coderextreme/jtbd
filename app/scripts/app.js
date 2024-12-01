@@ -2,14 +2,14 @@
 
 /**
  * @ngdoc overview
- * @name healthjwcApp
+ * @name jtbd
  * @description
- * # healthjwcApp
+ * # jtbd
  *
  * Main module of the application.
  */
 angular
-  .module('healthjwcApp', [
+  .module('jtbd', [
     'ngAnimate',
     'ngCookies',
     'ngResource',

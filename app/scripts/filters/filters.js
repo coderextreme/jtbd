@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('healthjwcApp')
+angular.module('jtbd')
   .filter('array', function() {
 	return function(input, filter) {
 		if (typeof(filter) !== 'undefined' && filter.trim() !== '') {
@@ -16,7 +16,7 @@ angular.module('healthjwcApp')
 	};
   });
 
-angular.module('healthjwcApp')
+angular.module('jtbd')
   .filter('select', function() {
 	return function(input, filter) {
 		var selected = input;

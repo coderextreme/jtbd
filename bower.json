@@ -1,6 +1,6 @@
 {
-  "name": "healthjwc",
-  "version": "0.0.0",
+  "name": "jtbd",
+  "version": "0.0.2",
   "dependencies": {
     "angular": "*",
     "json3": "*",

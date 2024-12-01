@@ -2,12 +2,12 @@
 
 /**
  * @ngdoc function
- * @name healthjwcApp.controller:AboutCtrl
+ * @name jtbd.controller:AboutCtrl
  * @description
  * # AboutCtrl
- * Controller of the healthjwcApp
+ * Controller of the jtbd
  */
-angular.module('healthjwcApp')
+angular.module('jtbd')
   .controller('AboutCtrl', function ($scope) {
     $scope.awesomeThings = [
       'HTML5 Boilerplate',
