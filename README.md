@@ -1,6 +1,6 @@
 # jtbd -- JSON transformation by demonstration
 
-# to install, run
+# to install, get npm or node (with npm) anbd run
 
 ```
 $ npm install
