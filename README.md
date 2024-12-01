@@ -6,5 +6,9 @@
 $ npm install
 $ npm install -g bower
 $ bower install
-$ npm install -g grunt
-$ grunt serve
+$ npm install -g sass
+$ sass app/styles/main.scss app/styles/main.css
+$ ln -s bower_components app/bower_components
+$ python -m http.server
+```
+Go to http://localhost:8000/app/index.html
