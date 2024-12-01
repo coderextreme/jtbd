@@ -12,3 +12,5 @@ $ ln -s bower_components app/bower_components
 $ python -m http.server
 ```
 Go to http://localhost:8000/app/index.html
+
+When selecting into json, use commas to separate property keys, strings for object property keys and numbers for array keys/indexes
