@@ -1,44 +1,12 @@
 {
   "name": "healthjwc",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "private": "true",
   "dependencies": {},
   "devDependencies": {
-    "bower": "*",
-    "grunt": "*",
-    "grunt-autoprefixer": "*",
-    "grunt-concurrent": "*",
-    "grunt-contrib-clean": "*",
-    "grunt-contrib-compass": "*",
-    "grunt-contrib-concat": "*",
-    "grunt-contrib-connect": "*",
-    "grunt-contrib-copy": "*",
-    "grunt-contrib-cssmin": "*",
-    "grunt-contrib-htmlmin": "*",
-    "grunt-contrib-imagemin": "*",
-    "grunt-contrib-jshint": "*",
-    "grunt-contrib-uglify": "*",
-    "grunt-contrib-watch": "*",
-    "grunt-filerev": "*",
-    "grunt-google-cdn": "*",
-    "grunt-karma": "*",
-    "grunt-newer": "*",
-    "grunt-ng-annotate": "*",
-    "grunt-svgmin": "*",
-    "grunt-usemin": "*",
-    "grunt-wiredep": "*",
-    "jasmine-core": "*",
-    "jshint-stylish": "*",
-    "karma": "*",
-    "karma-jasmine": "*",
-    "karma-phantomjs-launcher": "*",
-    "load-grunt-tasks": "*",
-    "time-grunt": "*"
+    "bower": "*"
   },
   "engines": {
     "node": "*"
-  },
-  "scripts": {
-    "test": "grunt test"
   }
 }
